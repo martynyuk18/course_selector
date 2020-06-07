@@ -1,6 +1,6 @@
 import pandas as pd
 
-#directions_data = pd.read_csv('data.csv')
+
 
 def user_data(user_input):
     user_input_dict = {}
@@ -16,6 +16,10 @@ def user_data(user_input):
         if user_input.index(word) % 2 == 0:
             key = word
         else:
+            try:
+                user_input_dict[key] = int[word]
+            except ValueError:
+                break
             user_input_dict[key] = int(word)
     return user_input_dict
 
@@ -53,7 +57,7 @@ def check_score(user_input, subject_list, data):
                     break
                 else:
                     count += 1
-                    if count == 3:
+                    if count == len(program_dict):
                         final_result.append(subject)
             except KeyError:
                 continue
