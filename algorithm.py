@@ -1,7 +1,5 @@
 import pandas as pd
 
-
-
 def user_data(user_input):
     user_input_dict = {}
     user_input = user_input.split()
@@ -17,10 +15,9 @@ def user_data(user_input):
             key = word
         else:
             try:
-                user_input_dict[key] = int[word]
-            except ValueError:
+                user_input_dict[key] = int(word)
+            except:
                 break
-            user_input_dict[key] = int(word)
     return user_input_dict
 
 def all_subjects(user_input, data):
