@@ -3,6 +3,7 @@ import datetime
 import requests
 import algorithm
 import pandas as pd
+import discounts
 
 university_data = pd.read_csv('data.csv')
 
@@ -59,7 +60,8 @@ def main():
             update = last_update(get_updates(url))
             chat_id = get_chat_id(last_update(get_updates(url))) 
             user_querry = get_text(update)
-            rule = "\nВведите Ваши результаты как на примере снизу:\nматематика 70 русский язык 70 физика 70"
+            cmmn_info = discounts.common_info()
+            rule = "\n" + cmmn_info
             if user_querry == "/start":
                 try:
                     username = get_username(update)
@@ -69,13 +71,30 @@ def main():
                     first_name = get_first_name(update)
                     greeting_message = greeting(first_name)
                     send_mess(chat_id, greeting_message + rule)
+            elif user_querry == "список":
+                subject_list = discounts.list_of_subjects()
+                send_mess(chat_id, subject_list)                
+            elif user_querry == "скидки":
+                discount_info = discounts.discounts_info() 
+                send_mess(chat_id, discount_info)
             else:
                 # обрабатываем запрос
+                list_disc = ['d70', 'd50', 'd25'] 
+                check_disc = user_querry.split()[-1]
+                if check_disc in list_disc:
+                    user_querry = user_querry[:-1]
+                    check_disc = int(check_disc[1:])/100
+                else:
+                    check_disc = 0
                 output_result = algorithm.output(user_querry, university_data)
                 if len(output_result) != 0:
                     for output_subject in output_result:
                         query = university_data.loc[university_data.program_spec == output_subject]
-                        result_message = "%s\nСсылка: %s\nСтоимость - %s руб."%(output_subject, str(query.iloc[0, 6]), str(query.iloc[0, 7]))
+                        if check_disc != 0:
+                            apply_discount = int(query.iloc[0, 7])-(int(query.iloc[0, 7])*check_disc)
+                            result_message = "%s\nСсылка: %s\nСтоимость - %s руб."%(output_subject, str(query.iloc[0, 6]), str(int(apply_discount)))
+                        else:
+                            result_message = "%s\nСсылка: %s\nСтоимость - %s руб."%(output_subject, str(query.iloc[0, 6]), str(query.iloc[0, 7]))
                         send_mess(chat_id, result_message)
                 else:
                     send_mess(chat_id, 'К сожалению по Вашим результатам нет подходящих направлений.')
