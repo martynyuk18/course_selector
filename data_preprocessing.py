@@ -27,6 +27,8 @@ data.program_spec = data.program_spec.ffill()
 data.cost = data.cost.ffill()
 data.link_1 = data.link_1.ffill()
 
+data.drop(index=[147, 153], inplace=True)
+
 data = data.dropna()
 
 data.to_csv('data.csv')
